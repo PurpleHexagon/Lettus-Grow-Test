@@ -7,8 +7,8 @@ allowing farmers to sow, harvest and track trays of crops as they grow.
 with different species of crops growing for different lengths of time and with different yields.
 
 there are five tasks bellow, we suggest you do them and in order however you dont have to.
-if you think you can do better by "colouring out side the lines" so to speak then go for it but its probaly more risky.
-feel free to change absolutly ANY file. 
+if you think you can do better by "colouring out side the lines" so to speak then go for it but its probably more risky.
+feel free to change absolutely ANY file. 
 though you will have to justify/explain your changes...
 
 once you are done, package this back up into a tar.gz. you have one week to complete what you can and email it back. good luck :)
@@ -30,7 +30,7 @@ Tasks:
 
 1) get it working :)  
 
-2) fix any failig tests.  
+2) fix any failing tests.  
 
 3) Add an estimated yield and estimated harvest date to tray data.  
 
