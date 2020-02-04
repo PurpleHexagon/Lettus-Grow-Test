@@ -62,7 +62,7 @@ class TrayApi(APIView):
                 'crop': tray.crop.id,
                 'growth_plan': tray.growth_plan.id,
                 'sow_date': str(tray.sow_date),
-                'data_harvest': str(tray.data_harvest),
+                'harvest_date': str(tray.harvest_date),
                 'total_yield': tray.total_yield,
             })
 
@@ -75,6 +75,6 @@ class TrayApi(APIView):
             'crop': tray.crop,
             'growth_plan': tray.growth_plan,
             'sow_date': str(tray.sow_date),
-            'data_harvest': str(tray.data_harvest),
+            'harvest_date': str(tray.harvest_date),
             'total_yield': tray.total_yield,
         })

@@ -43,14 +43,27 @@ Tasks:
       b) a sowing schedule with yield forecasting!!!  
 
 
-Setup:
+Useful commands:
 
+Up containers:
 ```bash
   docker-compose up
+```
+
+Run Migrations:
+```bash
   docker exec -it src_web_1 bash -c "python manage.py migrate"
+```
+
+Create Django Superuser:
+```bash
   docker exec -it src_web_1 bash -c "python manage.py createsuperuser"
 ```
 
+Run the tests:
+```bash
+  docker exec -it src_web_1 bash -c "python manage.py test"
+```
 Extras:
 
 - [ ] Serializers

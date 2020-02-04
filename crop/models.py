@@ -35,6 +35,6 @@ class Tray(models.Model):
         GrowthPlan, on_delete=models.PROTECT)
     sow_date = models.DateTimeField(
         default=django.utils.timezone.now())  # date sown
-    date_harvested = models.DateTimeField(
+    harvest_date = models.DateTimeField(
         default=None, null=True)  # date harvested
     total_yield = models.IntegerField(default=0)  # amount harvested
