@@ -4,6 +4,8 @@ import datetime
 from django.db import migrations, models
 import django.db.models.deletion
 from django.utils.timezone import utc
+from django.utils.timezone import get_current_timezone
+from django.utils.dateparse import parse_datetime
 
 import random
 
@@ -11,6 +13,8 @@ import random
 
 
 def populate(apps, schema_editor):
+    tz = get_current_timezone()
+
     crops = []
     crop_model = apps.get_model('crop', 'Crop')
     crops.append(crop_model.objects.create(name='Greek', family='Basil'))
@@ -42,34 +46,34 @@ def populate(apps, schema_editor):
     tray_model = apps.get_model('crop', 'Tray')
     for _ in range(20):
         tray_model.objects.create(
-            crop=crops[3], growth_plan=plans[4], sow_date='2020-1-1T12:00:00')
+            crop=crops[3], growth_plan=plans[4], sow_date=tz.localize(parse_datetime('2020-1-1T12:00:00')))
     for _ in range(20):
         value = random.randint(-20, 20)+80
         tray_model.objects.create(
-            crop=crops[0], growth_plan=plans[0], sow_date='2020-1-3T14:00:00', harvest_date='2020-1-11T15:00:00', total_yield=value)
+            crop=crops[0], growth_plan=plans[0], sow_date=tz.localize(parse_datetime('2020-1-3T14:00:00')), harvest_date=tz.localize(parse_datetime('2020-1-11T13:00:00')), total_yield=value)
     for _ in range(20):
         value = random.randint(-30, 30)+290
-        tray_model.objects.create(crop=crops[1], growth_plan=plans[3], sow_date='2019-12-1T11:00:00',
-                                  harvest_date='2019-12-23T16:00:00', total_yield=value)
+        tray_model.objects.create(crop=crops[1], growth_plan=plans[3], sow_date=tz.localize(parse_datetime('2019-12-1T11:00:00')),
+                                  harvest_date=tz.localize(parse_datetime('2019-12-23T16:00:00')), total_yield=value)
     for _ in range(20):
         tray_model.objects.create(
-            crop=crops[5], growth_plan=plans[5], sow_date='2020-1-22T12:00:00')
+            crop=crops[5], growth_plan=plans[5], sow_date=tz.localize(parse_datetime('2020-1-22T12:00:00')))
     for _ in range(20):
         value = random.randint(-40, 40)+320
         tray_model.objects.create(
-            crop=crops[0], growth_plan=plans[1], sow_date='2019-11-7T12:00:00', harvest_date='2019-12-1T12:00:00', total_yield=value)
+            crop=crops[0], growth_plan=plans[1], sow_date=tz.localize(parse_datetime('2019-11-7T12:00:00')), harvest_date=tz.localize(parse_datetime('2019-12-1T12:00:00')), total_yield=value)
     for _ in range(20):
         value = random.randint(-10, 10)+70
-        tray_model.objects.create(crop=crops[1], growth_plan=plans[2], sow_date='2019-11-21T12:00:00',
-                                  harvest_date='2019-11-21T12:00:00', total_yield=value)
+        tray_model.objects.create(crop=crops[1], growth_plan=plans[2], sow_date=tz.localize(parse_datetime('2019-11-21T12:00:00')),
+                                  harvest_date=tz.localize(parse_datetime('2019-11-21T12:00:00')), total_yield=value)
     for _ in range(20):
         value = random.randint(-30, 30)+235
         tray_model.objects.create(
-            crop=crops[3], growth_plan=plans[4], sow_date='2021-1-3T12:00:00', total_yield=value)
+            crop=crops[3], growth_plan=plans[4], sow_date=tz.localize(parse_datetime('2021-1-3T12:00:00')), total_yield=value)
     for _ in range(20):
         value = random.randint(-30, 30)+235
-        tray_model.objects.create(crop=crops[1], growth_plan=plans[3], sow_date='2019-12-3T12:00:00',
-                                  harvest_date='2019-11-10T12:00:00', total_yield=value)
+        tray_model.objects.create(crop=crops[1], growth_plan=plans[3], sow_date=tz.localize(parse_datetime('2019-12-3T12:00:00')),
+                                  harvest_date=tz.localize(parse_datetime('2019-11-10T12:00:00')), total_yield=value)
 
 
 class Migration(migrations.Migration):

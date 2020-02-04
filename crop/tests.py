@@ -47,7 +47,7 @@ class TrayTests(TestCase):
         data = {
             'crop_id': 1,
             'growth_plan_id': 1,
-            'sow_date': '2020-1-9T12:12:12'
+            'sow_date': '2020-1-9T12:12:12+00:00'
         }
         response = cli.post('/api/tray/', data, content_type="application/json")
         tray = json.loads(response.content.decode())

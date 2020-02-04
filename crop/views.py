@@ -73,6 +73,7 @@ class TrayApi(APIView):
     def post(self, request):
         tray = Tray.objects.create(**request.data)
         tray.save()
+
         return Response({
             'crop_id': tray.crop_id,
             'growth_plan_id': tray.growth_plan_id,
