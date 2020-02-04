@@ -36,7 +36,7 @@ class GrowthPlanApi(APIView):
         data = []
         for growth_plan in GrowthPlan.objects.all():
             data.append({
-                'crop': growth_plan.crop.id,
+                'crop_id': growth_plan.crop.id,
                 'name': growth_plan.name,
                 'growth_duration': growth_plan.growth_duration,
                 'est_yield': growth_plan.est_yield
@@ -48,10 +48,10 @@ class GrowthPlanApi(APIView):
         new_growth_plan = GrowthPlan.objects.create(**request.data)
         new_growth_plan.save()
         return Response({
-            'crop_id': new_growth_plan.crop,
+            'crop_id': new_growth_plan.crop.id,
             'name': new_growth_plan.name,
             'growth_duration': new_growth_plan.growth_duration,
-            'est_yeild': new_growth_plan.est_yeild
+            'est_yield': new_growth_plan.est_yield
         })
 
 
