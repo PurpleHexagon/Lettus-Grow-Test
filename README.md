@@ -50,6 +50,11 @@ Up containers:
   docker-compose up
 ```
 
+Create Migration:
+```bash
+  docker exec -it src_web_1 bash -c "python manage.py makemigrations crop"
+```
+
 Run Migrations:
 ```bash
   docker exec -it src_web_1 bash -c "python manage.py migrate"
@@ -67,9 +72,10 @@ Run the tests:
 Extras:
 
 - [ ] Serializers
-- [ ] Add image to Crop
-- [ ] Resource usage 
-- [ ] Efficiency Rating
+- [ ] Add Validation and filtering
+- [ ] Resource usage for grow plan
 - [ ] Sowing Schedule and yield forecasting
-- [ ] Variety for Crop
-- [ ] Build Frontend
+- [ ] Add image to Crop
+- [ ] Add a Crop identification endpoint
+- [ ] Variety of Crop to the tray
+- [ ] Efficiency Rating
