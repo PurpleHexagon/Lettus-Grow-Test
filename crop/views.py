@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 #import django_filters
 import json
+from django.core.exceptions import ValidationError
 
 from crop.models import Crop, GrowthPlan, Tray
 
@@ -22,6 +23,11 @@ class CropApi(APIView):
 
     def post(self, request):
         new_crop = Crop.objects.create(**request.data)
+        try:
+            new_crop.full_clean()
+        except ValidationError as e:
+            return Response({'status': 'failed', 'message': e})
+
         new_crop.save()
 
         return Response({
@@ -46,6 +52,11 @@ class GrowthPlanApi(APIView):
 
     def post(self, request):
         new_growth_plan = GrowthPlan.objects.create(**request.data)
+        try:
+            new_growth_plan.full_clean()
+        except ValidationError as e:
+            return Response({'status': 'failed', 'message': e})
+
         new_growth_plan.save()
         return Response({
             'crop_id': new_growth_plan.crop.id,
@@ -72,6 +83,10 @@ class TrayApi(APIView):
 
     def post(self, request):
         tray = Tray.objects.create(**request.data)
+        try:
+            tray.full_clean()
+        except ValidationError as e:
+            return Response({'status': 'failed', 'message': e})
         tray.save()
 
         return Response({

@@ -72,7 +72,7 @@ Run the tests:
 Extras:
 
 - [ ] Serializers
-- [ ] Add Validation and filtering
+- [ ] Add Validation and filtering - In Progress
 - [ ] Resource usage for grow plan
 - [ ] Sowing Schedule and yield forecasting
 - [ ] Add image to Crop
