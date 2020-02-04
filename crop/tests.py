@@ -24,7 +24,7 @@ class CropTests(TestCase):
             'name': 'soft',
             'family': 'Mint'
         }
-        responce = cli.post('/api/crop/', data)
+        responce = cli.post('/api/crop/', data, content_type="application/json")
         crop = json.loads(responce.content.decode())
         for key in self.fields:
             self.assertEqual(data[key], crop[key])
@@ -32,7 +32,7 @@ class CropTests(TestCase):
 
 class TrayTests(TestCase):
 
-    fields = {'crop', 'growth_plan', 'sow_date', 'harvest_date', 'total_yield'}
+    fields = {'crop_id', 'growth_plan_id', 'sow_date', 'harvest_date', 'total_yield'}
 
     def test_get(self):
         cli = Client()
@@ -45,11 +45,14 @@ class TrayTests(TestCase):
     def test_post(self):
         cli = Client()
         data = {
-            'crop': 1,
-            'growth_plan': 1,
+            'crop_id': 1,
+            'growth_plan_id': 1,
             'sow_date': '2020-1-9T12:12:12'
         }
-        responce = cli.post('/api/tray/', data)
+        responce = cli.post('/api/tray/', data, content_type="application/json")
         tray = json.loads(responce.content.decode())
         for key in self.fields:
-            self.assertEqual(data[key], tray[key])
+            if key in data:
+                self.assertEqual(data[key], tray[key])
+
+

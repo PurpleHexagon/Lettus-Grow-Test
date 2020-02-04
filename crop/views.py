@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 #import django_filters
+import json
 
 from crop.models import Crop, GrowthPlan, Tray
 
@@ -22,6 +23,7 @@ class CropApi(APIView):
     def post(self, request):
         new_crop = Crop.objects.create(**request.data)
         new_crop.save()
+
         return Response({
             'name': new_crop.name,
             'family': new_crop.family
@@ -46,7 +48,7 @@ class GrowthPlanApi(APIView):
         new_growth_plan = GrowthPlan.objects.create(**request.data)
         new_growth_plan.save()
         return Response({
-            'crop': new_growth_plan.crop,
+            'crop_id': new_growth_plan.crop,
             'name': new_growth_plan.name,
             'growth_duration': new_growth_plan.growth_duration,
             'est_yeild': new_growth_plan.est_yeild
@@ -59,8 +61,8 @@ class TrayApi(APIView):
         data = []
         for tray in Tray.objects.all():
             data.append({
-                'crop': tray.crop.id,
-                'growth_plan': tray.growth_plan.id,
+                'crop_id': tray.crop.id,
+                'growth_plan_id': tray.growth_plan.id,
                 'sow_date': str(tray.sow_date),
                 'harvest_date': str(tray.harvest_date),
                 'total_yield': tray.total_yield,
@@ -69,11 +71,11 @@ class TrayApi(APIView):
         return Response(data)
 
     def post(self, request):
-        new_crop = Crop.objects.create(**request.data)
-        new_crop.save()
+        tray = Tray.objects.create(**request.data)
+        tray.save()
         return Response({
-            'crop': tray.crop,
-            'growth_plan': tray.growth_plan,
+            'crop_id': tray.crop_id,
+            'growth_plan_id': tray.growth_plan_id,
             'sow_date': str(tray.sow_date),
             'harvest_date': str(tray.harvest_date),
             'total_yield': tray.total_yield,
