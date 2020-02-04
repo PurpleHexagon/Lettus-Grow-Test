@@ -38,3 +38,5 @@ class Tray(models.Model):
     harvest_date = models.DateTimeField(
         default=None, null=True)  # date harvested
     total_yield = models.IntegerField(default=0)  # amount harvested
+    estimated_yield = models.IntegerField( default=None, null=True)  # estimated yield grams
+    estimated_harvest_date = models.DateTimeField(default=None, null=True)  # estimated harvested
