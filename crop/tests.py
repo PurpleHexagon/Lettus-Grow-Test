@@ -14,7 +14,9 @@ class CropTests(TestCase):
         cli = Client()
         response = cli.get('/api/crop/')
         data = json.loads(response.content.decode())
+        self.assertEqual(response.status_code, 200)
         self.assertGreater(len(data), 1)
+
         for crop in data:
             self.assertEqual(set(crop.keys()), self.fields)
 
@@ -25,9 +27,22 @@ class CropTests(TestCase):
             'family': 'Mint'
         }
         response = cli.post('/api/crop/', data, content_type="application/json")
+        self.assertEqual(response.status_code, 200)
         crop = json.loads(response.content.decode())
+
         for key in self.fields:
             self.assertEqual(data[key], crop[key])
+
+    def test_post_fails_when_name_longer_than_100_chars(self):
+        cli = Client()
+        data = {
+            'name': 'soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft soft',
+            'family': 'Mint'
+        }
+        response = cli.post('/api/crop/', data, content_type="application/json")
+        self.assertEqual(response.status_code, 422)
+        decoded_content = json.loads(response.content.decode())
+        self.assertEqual(decoded_content['status'], 'failed')
 
 
 class TrayTests(TestCase):
@@ -38,6 +53,7 @@ class TrayTests(TestCase):
         cli = Client()
         response = cli.get('/api/tray/')
         data = json.loads(response.content.decode())
+        self.assertEqual(response.status_code, 200)
         self.assertGreater(len(data), 1)
         for tray in data:
             self.assertEqual(set(tray.keys()), self.fields)
@@ -50,6 +66,7 @@ class TrayTests(TestCase):
             'sow_date': '2020-01-09 12:12:12+00:00'
         }
         response = cli.post('/api/tray/', data, content_type="application/json")
+        self.assertEqual(response.status_code, 200)
         tray = json.loads(response.content.decode())
 
         for key in self.fields:
@@ -65,6 +82,7 @@ class GrowthPlansTests(TestCase):
         cli = Client()
         response = cli.get('/api/growthplan/')
         data = json.loads(response.content.decode())
+        self.assertEqual(response.status_code, 200)
         self.assertGreater(len(data), 1)
         for growth_plan in data:
             self.assertEqual(set(growth_plan.keys()), self.fields)
@@ -78,6 +96,7 @@ class GrowthPlansTests(TestCase):
                 'est_yield': 200,
             }
             response = cli.post('/api/growthplan/', data, content_type="application/json")
+            self.assertEqual(response.status_code, 200)
             growth_plan = json.loads(response.content.decode())
             for key in self.fields:
                 self.assertEqual(data[key], growth_plan[key])

@@ -26,7 +26,7 @@ class CropApi(APIView):
         try:
             new_crop.full_clean()
         except ValidationError as e:
-            return Response({'status': 'failed', 'message': e})
+            return Response({'status': 'failed', 'message': e}, status=422)
 
         new_crop.save()
 
@@ -34,7 +34,6 @@ class CropApi(APIView):
             'name': new_crop.name,
             'family': new_crop.family
         })
-
 
 class GrowthPlanApi(APIView):
 
@@ -55,7 +54,7 @@ class GrowthPlanApi(APIView):
         try:
             new_growth_plan.full_clean()
         except ValidationError as e:
-            return Response({'status': 'failed', 'message': e})
+            return Response({'status': 'failed', 'message': e}, status=422)
 
         new_growth_plan.save()
         return Response({
@@ -86,7 +85,7 @@ class TrayApi(APIView):
         try:
             tray.full_clean()
         except ValidationError as e:
-            return Response({'status': 'failed', 'message': e})
+            return Response({'status': 'failed', 'message': e}, status=422)
         tray.save()
 
         return Response({
