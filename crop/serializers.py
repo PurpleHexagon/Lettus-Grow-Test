@@ -43,6 +43,15 @@ class TraySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tray
-        fields = ['id', 'crop', 'growth_plan', 'sow_date', 'harvest_date', 'total_yield']
+        fields = [
+            'id',
+            'crop',
+            'growth_plan',
+            'sow_date',
+            'harvest_date',
+            'total_yield',
+            'estimated_yield', 
+            'estimated_harvest_date'
+        ]
 
 

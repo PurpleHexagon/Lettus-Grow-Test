@@ -1,6 +1,6 @@
 from django.db import models
 import django
-from django.core.validators import MaxLengthValidator
+from django.core.validators import MaxLengthValidator, DecimalValidator
 
 # pylint: disable=all
 
@@ -38,5 +38,5 @@ class Tray(models.Model):
     harvest_date = models.DateTimeField(
         default=None, null=True, blank=True)  # date harvested
     total_yield = models.IntegerField(default=0)  # amount harvested
-    estimated_yield = models.IntegerField( default=None, null=True, blank=True)  # estimated yield grams
+    estimated_yield = models.IntegerField(default=None, null=True, blank=True)  # estimated yield grams
     estimated_harvest_date = models.DateTimeField(default=None, null=True, blank=True)  # estimated harvested
