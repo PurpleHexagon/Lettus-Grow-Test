@@ -71,7 +71,7 @@ Run the tests:
 ```
 Extras:
 
-- [ ] Serializers
+- [x] Serializers
 - [ ] Add Validation and filtering - In Progress
 - [ ] Resource usage for grow plan
 - [ ] Sowing Schedule and yield forecasting
