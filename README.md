@@ -75,7 +75,5 @@ Extras:
 - [x] Add Validation 
 - [ ] Resource usage for grow plan
 - [ ] Sowing Schedule and yield forecasting
-- [ ] Add image to Crop
 - [ ] Add a Crop identification endpoint
-- [ ] Variety of Crop to the tray
-- [ ] Efficiency Rating
+
