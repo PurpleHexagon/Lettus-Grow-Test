@@ -1,5 +1,6 @@
 from crop.models import Crop, GrowthPlan, Tray
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 class CropSerializer(serializers.ModelSerializer):
     """
@@ -15,6 +16,13 @@ class CropSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crop
         fields = ['id', 'name', 'family']
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=('name', 'family')
+            )
+        ]
 
 class GrowthPlanSerializer(serializers.ModelSerializer):
     """
@@ -50,7 +58,7 @@ class TraySerializer(serializers.ModelSerializer):
             'sow_date',
             'harvest_date',
             'total_yield',
-            'estimated_yield', 
+            'estimated_yield',
             'estimated_harvest_date'
         ]
 
