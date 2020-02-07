@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
-#import django_filters
 import json
 from django.core.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
@@ -52,7 +51,15 @@ class TrayApi(APIView):
 
     def get(self, request):
         paginator = PageNumberPagination()
-        crops = paginator.paginate_queryset(Tray.objects.all().order_by('id'), request)
+        queryset = Tray.objects.all()
+
+        if request.GET.get('crop_id') != None:
+            queryset = queryset.filter(crop_id=request.GET.get('crop_id'))
+
+        if request.GET.get('growth_plan_id') != None:
+            queryset = queryset.filter(growth_plan_id=request.GET.get('growth_plan_id'))
+
+        crops = paginator.paginate_queryset(queryset.order_by('id'), request)
         serializer = TraySerializer(crops, many=True)
 
         return paginator.get_paginated_response(serializer.data)
