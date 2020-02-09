@@ -69,11 +69,3 @@ Run the tests:
 ```bash
   docker exec -it src_web_1 bash -c "python manage.py test"
 ```
-Extras:
-
-- [x] Serializers
-- [x] Add Validation 
-- [ ] Resource usage for grow plan
-- [ ] Sowing Schedule and yield forecasting
-- [ ] Add a Crop identification endpoint
-
