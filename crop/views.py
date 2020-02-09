@@ -4,7 +4,7 @@ from rest_framework.response import Response
 import json
 from django.core.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
-from crop.models import Crop, GrowthPlan, Tray
+from crop.models import Crop, GrowthPlan, Tray, OutputDevice
 from crop.serializers import CropSerializer, TraySerializer, GrowthPlanSerializer
 
 # pylint: disable=all

@@ -37,7 +37,16 @@ class GrowthPlanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GrowthPlan
-        fields = ['id', 'crop', 'name', 'growth_duration', 'est_yield']
+        fields = [
+            'id',
+            'crop',
+            'name',
+            'growth_duration',
+            'est_yield',
+            'estimated_grow_cost',
+            'estimated_water_usage',
+            'estimated_electricity_usage'
+        ]
 
 class TraySerializer(serializers.ModelSerializer):
     """
@@ -59,7 +68,10 @@ class TraySerializer(serializers.ModelSerializer):
             'harvest_date',
             'total_yield',
             'estimated_yield',
-            'estimated_harvest_date'
+            'estimated_harvest_date',
+            'grow_cost',
+            'water_used',
+            'electricity_used'
         ]
 
 

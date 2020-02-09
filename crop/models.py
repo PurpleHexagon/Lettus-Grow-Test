@@ -1,9 +1,9 @@
 from django.db import models
 import django
-from django.core.validators import MaxLengthValidator, DecimalValidator
+from django.core.validators import MaxLengthValidator, DecimalValidator, RegexValidator
+from datetime import datetime, date
 
 # pylint: disable=all
-
 
 class Crop(models.Model):
     """
@@ -18,19 +18,62 @@ class OutputDevice(models.Model):
     An output device such as a grow light
     """
 
-    device_type = models.IntegerField() # The type of the device represented by an integer, 1: Grow Light
-    units = models.IntegerField() # The units for the device
+    COST_PER_MILLILITRE = 0.0005
+    COST_PER_KILOWATT = 0.0002
+
+    TYPE_GROW_LIGHT = 1
+    TYPE_WATER_SPRAYER = 2
+    TYPE_GROW_LIGHT_DESCRIPTION = 'Grow Light'
+    TYPE_WATER_SPRAYER_DESCRIPTION = 'Water Sprayer'
+    TYPES = ((TYPE_GROW_LIGHT, TYPE_GROW_LIGHT_DESCRIPTION), (TYPE_WATER_SPRAYER, TYPE_WATER_SPRAYER_DESCRIPTION))
+
+    UNIT_MILLILITRES = 1
+    UNIT_KILOWATTS = 2
+    UNIT_MILLILITRES_DESCRIPTION = 'Millilitres'
+    UNIT_KILOWATTS_DESCRIPTION = 'Kilowatts'
+    UNITS = ((UNIT_MILLILITRES, UNIT_MILLILITRES_DESCRIPTION), (UNIT_KILOWATTS, UNIT_KILOWATTS_DESCRIPTION))
+
+    name = models.CharField(max_length=100, validators=[MaxLengthValidator(100)])  # name of device
+    device_type = models.IntegerField(choices=TYPES) # The type of the device represented by an integer, 1: Grow Light
+    units = models.IntegerField(choices=UNITS) # The units for the device
     units_per_second = models.IntegerField() # Units per second outputted
 
+    def cost_per_unit(self):
+        if self.device_type == self.UNIT_MILLILITRES:
+            return self.COST_PER_MILLILITRE
+
+        if self.device_type == self.UNIT_KILOWATTS:
+            return self.COST_PER_KILOWATT
+
+    def cost_per_day(self):
+        cost_per_day = 0
+        output_device_tasks = self.output_device_tasks.all()
+        for output_device_task in output_device_tasks:
+            delta = datetime.combine(date.min, output_device_task.end_time) - datetime.combine(date.min, output_device_task.start_time)
+            cost_per_day = (delta.total_seconds() * self.units_per_second * self.cost_per_unit()) + cost_per_day
+
+        return cost_per_day
+
+    def units_per_day(self):
+        units_per_day = 0
+        output_device_tasks = self.output_device_tasks.all()
+        for output_device_task in output_device_tasks:
+            delta = datetime.combine(date.min, output_device_task.end_time) - datetime.combine(date.min, output_device_task.start_time)
+            units_per_day = (delta.total_seconds() * self.units_per_second) + units_per_day
+
+        return units_per_day
 
 class OutputDeviceScheduledTask(models.Model):
     """
     A scheduled task for a device
+
+    TODO: Currently a scheduled task only has a start and end time, this could be improved by also having the option
+    of a duration and interval, ie turn on for 3 minutes at 15 minute intervals
     """
 
-    output_device = models.ForeignKey(OutputDevice, on_delete=models.PROTECT)
-    start_time = models.DateTimeField(default=None, null=False) # The start time of the task
-    end_time = models.DateTimeField(default=None, null=True, blank=True) # The end time of the task
+    output_device = models.ForeignKey(OutputDevice, on_delete=models.PROTECT, related_name='output_device_tasks')
+    start_time = models.TimeField(default=None, null=False) # The start time of the task
+    end_time = models.TimeField(default=None, null=True, blank=True) # The end time of the task
 
 class GrowthPlan(models.Model):
     """
@@ -43,6 +86,31 @@ class GrowthPlan(models.Model):
     est_yield = models.IntegerField()  # estimated yield grams
     output_devices = models.ManyToManyField(OutputDevice)
 
+    @property
+    def estimated_grow_cost(self):
+        cost = 0
+        output_devices = self.output_devices.all()
+        for output_device in output_devices:
+            cost = cost + (output_device.cost_per_day() * self.growth_duration)
+        return cost
+
+    @property
+    def estimated_water_usage(self):
+        water_used = 0
+        output_devices = self.output_devices.all()
+        for output_device in output_devices:
+            if output_device.device_type == OutputDevice.TYPE_WATER_SPRAYER:
+                water_used = water_used + (output_device.units_per_day() * self.growth_duration)
+        return water_used
+
+    @property
+    def estimated_electricity_usage(self):
+        electricity_used = 0
+        output_devices = self.output_devices.all()
+        for output_device in output_devices:
+            if output_device.device_type == OutputDevice.TYPE_GROW_LIGHT:
+                electricity_used = electricity_used + (output_device.units_per_day() * self.growth_duration)
+        return electricity_used
 
 class Tray(models.Model):
     """
@@ -59,3 +127,52 @@ class Tray(models.Model):
     total_yield = models.IntegerField(default=0)  # amount harvested
     estimated_yield = models.IntegerField(default=None, null=True, blank=True)  # estimated yield grams
     estimated_harvest_date = models.DateTimeField(default=None, null=True, blank=True)  # estimated harvested
+
+    @property
+    def grow_cost(self):
+        cost = 0
+        growth_plan = self.growth_plan
+
+        if self.harvest_date == None or self.sow_date == None:
+            return cost
+
+        days_for_grow = self.harvest_date - self.sow_date
+        output_devices = growth_plan.output_devices.all()
+
+        for output_device in output_devices:
+            cost = cost + (output_device.cost_per_unit() * output_device.units_per_day()) * ((days_for_grow.total_seconds() / 60 / 60) / 24)
+        return cost
+
+    @property
+    def water_used(self):
+        growth_plan = self.growth_plan
+        water_used = 0
+
+        if self.harvest_date == None or self.sow_date == None:
+            return water_used
+
+        days_for_grow = self.harvest_date - self.sow_date
+        output_devices = growth_plan.output_devices.all()
+
+        for output_device in output_devices:
+            if output_device.device_type == OutputDevice.TYPE_WATER_SPRAYER:
+                water_used = water_used + (output_device.units_per_day() * ((days_for_grow.total_seconds() / 60 / 60) / 24))
+
+        return water_used
+
+    @property
+    def electricity_used(self):
+        growth_plan = self.growth_plan
+        electricity_used = 0
+
+        if self.harvest_date == None or self.sow_date == None:
+            return electricity_used
+
+        days_for_grow = self.harvest_date - self.sow_date
+        output_devices = growth_plan.output_devices.all()
+
+        for output_device in output_devices:
+            if output_device.device_type == OutputDevice.TYPE_GROW_LIGHT:
+                electricity_used = electricity_used + (output_device.units_per_day() * ((days_for_grow.total_seconds() / 60 / 60) / 24))
+
+        return electricity_used

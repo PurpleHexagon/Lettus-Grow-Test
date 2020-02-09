@@ -56,7 +56,10 @@ class TrayTests(TestCase):
         'harvest_date',
         'total_yield',
         'estimated_yield',
-        'estimated_harvest_date'
+        'estimated_harvest_date',
+        'grow_cost',
+        'water_used',
+        'electricity_used',
     }
 
     def test_get(self):
@@ -86,7 +89,16 @@ class TrayTests(TestCase):
 
 class GrowthPlansTests(TestCase):
 
-    fields = {'id', 'name', 'crop', 'growth_duration', 'est_yield'}
+    fields = {
+        'id',
+        'name',
+        'crop',
+        'growth_duration',
+        'est_yield',
+        'estimated_electricity_usage',
+        'estimated_water_usage',
+        'estimated_grow_cost',
+    }
 
     def test_get(self):
         cli = Client()
