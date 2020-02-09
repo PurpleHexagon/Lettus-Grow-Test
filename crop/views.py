@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from crop.models import Crop, GrowthPlan, Tray, OutputDevice
 from crop.serializers import CropSerializer, TraySerializer, GrowthPlanSerializer
+from rest_framework.decorators import api_view
 
 # pylint: disable=all
 
@@ -46,6 +47,14 @@ class GrowthPlanApi(APIView):
         new_growth_plan = serializer.save()
 
         return Response(serializer.data)
+
+    @api_view(('POST',))
+    def add_device(self, growth_plan_id, device_id):
+       growth_plan = GrowthPlan.objects.get(id=growth_plan_id)
+       growth_plan.output_devices.add(OutputDevice.objects.get(id=device_id))
+       serializer = GrowthPlanSerializer(growth_plan)
+
+       return Response(serializer.data)
 
 class TrayApi(APIView):
 
