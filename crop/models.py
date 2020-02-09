@@ -220,5 +220,3 @@ class Tray(models.Model):
                 electricity_used = electricity_used + (output_device.units_per_day() * ((Decimal(days_for_grow.total_seconds()) / 60 / 60) / 24))
 
         return electricity_used.quantize(Decimal("0.01"))
-
-# class TrayBatch(models.Model):
