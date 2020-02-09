@@ -2,6 +2,7 @@ from django.db import models
 import django
 from django.core.validators import MaxLengthValidator, DecimalValidator, RegexValidator
 from datetime import datetime, date
+from decimal import Decimal
 
 # pylint: disable=all
 
@@ -18,8 +19,9 @@ class OutputDevice(models.Model):
     An output device such as a grow light
     """
 
-    COST_PER_MILLILITRE = 0.0005
-    COST_PER_KILOWATT = 0.0002
+    # TODO: Move these two an appropriate place, as these would change over time should be in database
+    COST_PER_MILLILITRE = '0.0005' # Cost in pound
+    COST_PER_KILOWATT = '0.0002' # Cost in pounds
 
     TYPE_GROW_LIGHT = 1
     TYPE_WATER_SPRAYER = 2
@@ -39,29 +41,37 @@ class OutputDevice(models.Model):
     units_per_second = models.IntegerField() # Units per second outputted
 
     def cost_per_unit(self):
+        """
+        Returns the correct unit type based on the device type
+        """
         if self.device_type == self.UNIT_MILLILITRES:
-            return self.COST_PER_MILLILITRE
+            return Decimal(self.COST_PER_MILLILITRE)
 
         if self.device_type == self.UNIT_KILOWATTS:
-            return self.COST_PER_KILOWATT
+            return Decimal(self.COST_PER_KILOWATT)
 
     def cost_per_day(self):
+        """
+        Calculates the cost per day by iterating through the devices and calculating the cost for each device
+        TODO: Optimise by adding caching
+        """
+
         cost_per_day = 0
         output_device_tasks = self.output_device_tasks.all()
         for output_device_task in output_device_tasks:
             delta = datetime.combine(date.min, output_device_task.end_time) - datetime.combine(date.min, output_device_task.start_time)
-            cost_per_day = (delta.total_seconds() * self.units_per_second * self.cost_per_unit()) + cost_per_day
+            cost_per_day = (Decimal(delta.total_seconds()) * self.units_per_second * self.cost_per_unit()) + cost_per_day
 
-        return cost_per_day
+        return cost_per_day.quantize(Decimal("0.01"))
 
     def units_per_day(self):
         units_per_day = 0
         output_device_tasks = self.output_device_tasks.all()
         for output_device_task in output_device_tasks:
             delta = datetime.combine(date.min, output_device_task.end_time) - datetime.combine(date.min, output_device_task.start_time)
-            units_per_day = (delta.total_seconds() * self.units_per_second) + units_per_day
+            units_per_day = (Decimal(delta.total_seconds()) * Decimal(self.units_per_second)) + units_per_day
 
-        return units_per_day
+        return Decimal(units_per_day)
 
 class OutputDeviceScheduledTask(models.Model):
     """
@@ -88,29 +98,41 @@ class GrowthPlan(models.Model):
 
     @property
     def estimated_grow_cost(self):
-        cost = 0
+        """
+        Returns the estimated cost of resources for the grow plan
+        """
+
+        cost = Decimal('0')
         output_devices = self.output_devices.all()
         for output_device in output_devices:
             cost = cost + (output_device.cost_per_day() * self.growth_duration)
-        return cost
+        return cost.quantize(Decimal("0.01"))
 
     @property
     def estimated_water_usage(self):
-        water_used = 0
+        """
+        Returns the estimated water usage for the grow plan
+        """
+
+        water_used = Decimal('0')
         output_devices = self.output_devices.all()
         for output_device in output_devices:
             if output_device.device_type == OutputDevice.TYPE_WATER_SPRAYER:
                 water_used = water_used + (output_device.units_per_day() * self.growth_duration)
-        return water_used
+        return water_used.quantize(Decimal("0.01"))
 
     @property
     def estimated_electricity_usage(self):
-        electricity_used = 0
+        """
+        Returns the estimated electricity usage for the grow plan
+        """
+
+        electricity_used = Decimal('0')
         output_devices = self.output_devices.all()
         for output_device in output_devices:
             if output_device.device_type == OutputDevice.TYPE_GROW_LIGHT:
                 electricity_used = electricity_used + (output_device.units_per_day() * self.growth_duration)
-        return electricity_used
+        return electricity_used.quantize(Decimal("0.01"))
 
 class Tray(models.Model):
     """
@@ -130,7 +152,12 @@ class Tray(models.Model):
 
     @property
     def grow_cost(self):
-        cost = 0
+        """
+        Returns the total cost of resources to grow the tray. This will return zero until there is a
+        harvest_date and a sow_date
+        """
+
+        cost = Decimal('0')
         growth_plan = self.growth_plan
 
         if self.harvest_date == None or self.sow_date == None:
@@ -140,13 +167,19 @@ class Tray(models.Model):
         output_devices = growth_plan.output_devices.all()
 
         for output_device in output_devices:
-            cost = cost + (output_device.cost_per_unit() * output_device.units_per_day()) * ((days_for_grow.total_seconds() / 60 / 60) / 24)
-        return cost
+            cost = cost + (output_device.cost_per_unit() * output_device.units_per_day()) * ((Decimal(days_for_grow.total_seconds()) / 60 / 60) / 24)
+        return cost.quantize(Decimal("0.01"))
 
     @property
     def water_used(self):
+        """
+        Returns the total water used to grow the tray. This will return zero until there is a
+        harvest_date and a sow_date
+        TODO: Add return an estimated usage when tray has not been harvested
+        """
+
         growth_plan = self.growth_plan
-        water_used = 0
+        water_used = Decimal('0')
 
         if self.harvest_date == None or self.sow_date == None:
             return water_used
@@ -156,14 +189,20 @@ class Tray(models.Model):
 
         for output_device in output_devices:
             if output_device.device_type == OutputDevice.TYPE_WATER_SPRAYER:
-                water_used = water_used + (output_device.units_per_day() * ((days_for_grow.total_seconds() / 60 / 60) / 24))
+                water_used = water_used + (output_device.units_per_day() * (Decimal((days_for_grow.total_seconds()) / 60 / 60) / 24))
 
-        return water_used
+        return water_used.quantize(Decimal("0.01"))
 
     @property
     def electricity_used(self):
+        """
+        Returns the total electricity used to grow the tray. This will return zero until there is a
+        harvest_date and a sow_date
+        TODO: Add return an estimated usage when tray has not been harvested
+        """
+
         growth_plan = self.growth_plan
-        electricity_used = 0
+        electricity_used = Decimal('0')
 
         if self.harvest_date == None or self.sow_date == None:
             return electricity_used
@@ -173,6 +212,6 @@ class Tray(models.Model):
 
         for output_device in output_devices:
             if output_device.device_type == OutputDevice.TYPE_GROW_LIGHT:
-                electricity_used = electricity_used + (output_device.units_per_day() * ((days_for_grow.total_seconds() / 60 / 60) / 24))
+                electricity_used = electricity_used + (output_device.units_per_day() * ((Decimal(days_for_grow.total_seconds()) / 60 / 60) / 24))
 
-        return electricity_used
+        return electricity_used.quantize(Decimal("0.01"))
