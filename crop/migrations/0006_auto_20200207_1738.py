@@ -17,9 +17,4 @@ class Migration(migrations.Migration):
             name='output_devices',
             field=models.ManyToManyField(to='crop.OutputDevice'),
         ),
-        migrations.AlterField(
-            model_name='tray',
-            name='sow_date',
-            field=models.DateTimeField(default=datetime.datetime(2020, 2, 7, 17, 38, 46, 332515, tzinfo=utc)),
-        ),
     ]

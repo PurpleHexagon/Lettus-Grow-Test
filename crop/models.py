@@ -148,7 +148,7 @@ class Tray(models.Model):
     growth_plan = models.ForeignKey(
         GrowthPlan, on_delete=models.PROTECT)
     sow_date = models.DateTimeField(
-        default=django.utils.timezone.now())  # date sown
+        default=django.utils.timezone.now)  # date sown
     harvest_date = models.DateTimeField(
         default=None, null=True, blank=True)  # date harvested
     total_yield = models.IntegerField(default=0)  # amount harvested
@@ -220,3 +220,5 @@ class Tray(models.Model):
                 electricity_used = electricity_used + (output_device.units_per_day() * ((Decimal(days_for_grow.total_seconds()) / 60 / 60) / 24))
 
         return electricity_used.quantize(Decimal("0.01"))
+
+# class TrayBatch(models.Model):

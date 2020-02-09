@@ -24,9 +24,4 @@ class Migration(migrations.Migration):
             name='device_type',
             field=models.IntegerField(validators=[django.core.validators.RegexValidator('^[{self.TYPE_GROW_LIGHT}, {self.TYPE_WATER_SPRAYER}]$', 'Not a valid type')]),
         ),
-        migrations.AlterField(
-            model_name='tray',
-            name='sow_date',
-            field=models.DateTimeField(default=datetime.datetime(2020, 2, 9, 9, 10, 54, 689225, tzinfo=utc)),
-        ),
     ]

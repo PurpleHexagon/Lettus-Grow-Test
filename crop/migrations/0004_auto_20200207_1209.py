@@ -43,9 +43,4 @@ class Migration(migrations.Migration):
             name='harvest_date',
             field=models.DateTimeField(blank=True, default=None, null=True),
         ),
-        migrations.AlterField(
-            model_name='tray',
-            name='sow_date',
-            field=models.DateTimeField(default=datetime.datetime(2020, 2, 7, 12, 9, 34, 660839, tzinfo=utc)),
-        ),
     ]

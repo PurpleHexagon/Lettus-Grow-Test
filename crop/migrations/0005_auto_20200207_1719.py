@@ -22,11 +22,6 @@ class Migration(migrations.Migration):
                 ('units_per_second', models.IntegerField()),
             ],
         ),
-        migrations.AlterField(
-            model_name='tray',
-            name='sow_date',
-            field=models.DateTimeField(default=datetime.datetime(2020, 2, 7, 17, 19, 24, 801793, tzinfo=utc)),
-        ),
         migrations.CreateModel(
             name='OutputDeviceScheduledTask',
             fields=[
