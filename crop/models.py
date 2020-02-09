@@ -65,6 +65,11 @@ class OutputDevice(models.Model):
         return cost_per_day.quantize(Decimal("0.01"))
 
     def units_per_day(self):
+        """
+        Calculates the units per day by iterating through the devices and calculating the units used for each device
+        TODO: Optimise by adding caching
+        """
+
         units_per_day = 0
         output_device_tasks = self.output_device_tasks.all()
         for output_device_task in output_device_tasks:
